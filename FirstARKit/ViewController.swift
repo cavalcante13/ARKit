@@ -44,7 +44,7 @@ class ViewController: UIViewController {
  
     @IBAction func reset(_ sender : Any) {
         sceneView.session.pause()
-        sceneView.scene.rootNode.enumerateHierarchy { (node, _) in
+        sceneView.scene.rootNode.enumerateChildNodes { (node, _) in
             node.removeFromParentNode()
         }
         

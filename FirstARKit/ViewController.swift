@@ -62,8 +62,8 @@ class ViewController: UIViewController {
         }
         
         guard let currentFrame = sceneView.session.currentFrame else {return}
-        var translation = matrix_float4x4()
-        translation.columns.3.z = -0.1
+        var translation = matrix_float3x3()
+        translation.columns.2.z = -0.1
         
         let sphere = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
         sphere.firstMaterial?.diffuse.contents = UIColor.red
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
         sphere.firstMaterial?.isDoubleSided = true
         
         let sphereNode = SCNNode(geometry: sphere)
-        sphereNode.simdTransform = matrix_multiply(currentFrame.camera.transform, translation)
+        sphereNode.worldPosition = SCNVector3(currentFrame.camera.transform.columns.0.x,0,-0.2)
         sceneView.scene.rootNode.addChildNode(sphereNode)
     }
     

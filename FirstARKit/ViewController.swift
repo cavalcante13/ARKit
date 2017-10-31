@@ -21,12 +21,16 @@ class ViewController: UIViewController {
         let box = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
         node.geometry = box
         
+        configuration.planeDetection = .horizontal
+        
         sceneView.scene = SCNScene()
         
         sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints, ARSCNDebugOptions.showWorldOrigin]
         sceneView.automaticallyUpdatesLighting = true
         sceneView.autoenablesDefaultLighting   = true
         sceneView.session.run(configuration)
+        
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:))))
     }
     
     @IBAction func add(_ sender: Any) {
@@ -49,6 +53,26 @@ class ViewController: UIViewController {
         }
         
         sceneView.session.run(configuration, options: [.removeExistingAnchors, .resetTracking])
+    }
+    
+    @objc
+    func handleTapGesture(_ sender : UITapGestureRecognizer) {
+        if sender.state != .ended {
+            return
+        }
+        
+        guard let currentFrame = sceneView.session.currentFrame else {return}
+        var translation = matrix_float4x4()
+        translation.columns.3.z = -0.1
+        
+        let sphere = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
+        sphere.firstMaterial?.diffuse.contents = UIColor.red
+        sphere.firstMaterial?.lightingModel = .physicallyBased
+        sphere.firstMaterial?.isDoubleSided = true
+        
+        let sphereNode = SCNNode(geometry: sphere)
+        sphereNode.simdTransform = matrix_multiply(currentFrame.camera.transform, translation)
+        sceneView.scene.rootNode.addChildNode(sphereNode)
     }
     
     func random(_ minValue : CGFloat, maxValue : CGFloat)-> CGFloat {
